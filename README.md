@@ -1,4 +1,6 @@
  #threadRacing
 
 
-main
+int main(){
+
+}
