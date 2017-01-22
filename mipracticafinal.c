@@ -261,9 +261,9 @@ void *accionesJuez(){
 		sleep(10);
 		//pthread_mutex_lock(&semaforoCorredor);
 		//elegimos corredor a sancionar, si no está corriendo buscamos otro.
-		a=aleatorio(0,numcorredores);
+		a=aleatorio(0,numCorredores);
 		while(corredores[a].correr==0){
-			a=aleatorio(0,numcorredores);
+			a=aleatorio(0,numCorredores);
 		}
 		corredores[a].sancionado=1;
 		pthread_cond_wait(&)
