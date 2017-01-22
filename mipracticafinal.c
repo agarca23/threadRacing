@@ -269,7 +269,7 @@ void *accionesJuez(){
 		pthread_cond_wait(&)
 		
 		sleep(3);
-		corredor[a].sancionado=0;//después de cumplir la sanción		
+		corredores[a].sancionado=0;//después de cumplir la sanción		
 		//pthread_mutex_unlock(&semaforoCorredor);
 	}
 }
