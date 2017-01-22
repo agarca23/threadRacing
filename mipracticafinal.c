@@ -28,11 +28,14 @@ pthread_mutex_t semaforoLog;
 pthread_mutex_t semaforoBox1;
 pthread_mutex_t semaforoBox2;
 ptrhead_mutex_t semaforoJuez;
+pthread_cond_t juez;
+pthread_cond_t corredor;
 int numCorredores;
 struct listaCorredores{
 	int id;
 	int estado;//estado=1 no necesita entrar en box
 	int correr;
+	int sancionado;
 };
 struct listaCorredores corredores[4];
 FILE *fichero;
@@ -93,6 +96,7 @@ int main(){
 		corredores[i].id=0;
 		corredores[i].estado=1;
 		corredores[i].correr= 1;
+		corredores[i].sancionado=0;
 	}
 	
 	//crear hilos e iniciarlos
@@ -130,6 +134,7 @@ void nuevoCorredor(){
 			corredores[i].id=numCorredores;
 			corredores[i].estado=1;
 			corredores[i].correr=1;
+			corredores[i].sancionado=0;
 
 			//creamos el hilo por cada nuevo corredor
 
@@ -175,6 +180,12 @@ void *accionesCorredor(void *numCorredor){
 				problemas = aleatorio(0,1);
 				if(problemas==1){
 				corredores[*(int*)numCorredor].estado==0;
+				}
+				if(corredores[n].sancionado==1){
+					/*pthread_cond_signal(&)*//*notifica al juez que ha visto la sanción*/
+					
+					/*pthread_cond2_wait()*//*espera a cumplir la sanción*/
+					
 				}
 				numVuelta ++;
 			}
@@ -244,6 +255,24 @@ void *accionesBox (void *numBox){
 }
 
 
+void *accionesJuez(){
+	int a;
+	for(;;){
+		sleep(10);
+		//pthread_mutex_lock(&semaforoCorredor);
+		//elegimos corredor a sancionar, si no está corriendo buscamos otro.
+		a=aleatorio(0,numcorredores);
+		while(corredores[a].correr==0){
+			a=aleatorio(0,numcorredores);
+		}
+		corredores[a].sancionado=1;
+		pthread_cond_wait(&)
+		
+		sleep(3);
+		corredor[a].sancionado=0;//después de cumplir la sanción		
+		//pthread_mutex_unlock(&semaforoCorredor);
+	}
+}
 
 
 
