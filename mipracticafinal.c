@@ -107,7 +107,7 @@ int main(){
 	pthread_create (&box1, NULL, accionesBox, (void*)&b1);
 	pthread_create (&box2, NULL, accionesBox, (void*)&b2);
 	
-	pthread juez;
+	pthread_t juez;
 	pthread_create (&juez, NULL, accionesJuez, NULL);
 
 	//Esperamos hasta que llegue una señal
