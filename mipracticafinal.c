@@ -27,7 +27,7 @@ pthread_mutex_t semaforoCorredor;
 pthread_mutex_t semaforoLog;
 pthread_mutex_t semaforoBox1;
 pthread_mutex_t semaforoBox2;
-ptrhead_mutex_t semaforoJuez;
+pthread_mutex_t semaforoJuez;
 pthread_cond_t juez;
 pthread_cond_t corredor;
 int numCorredores;
@@ -36,6 +36,8 @@ struct listaCorredores{
 	int estado;//estado=1 no necesita entrar en box
 	int correr;
 	int sancionado;
+	int tiempoTotal;
+	int terminado;
 };
 struct listaCorredores corredores[4];
 FILE *fichero;
@@ -97,6 +99,8 @@ int main(){
 		corredores[i].estado=1;
 		corredores[i].correr= 1;
 		corredores[i].sancionado=0;
+		corredores[i].tiempoTotal=0;
+		corredores[i].terminado=0;
 	}
 	
 	//crear hilos e iniciarlos
@@ -135,6 +139,8 @@ void nuevoCorredor(){
 			corredores[i].estado=1;
 			corredores[i].correr=1;
 			corredores[i].sancionado=0;
+			corredores[i].tiempoTotal=0;
+			corredores[i].terminado=0;
 
 			//creamos el hilo por cada nuevo corredor
 
@@ -173,20 +179,26 @@ void *accionesCorredor(void *numCorredor){
 		pthread_mutex_lock(&semaforoCorredor);
 		if(corredores[*(int*)numCorredor].correr==1){	
 			while(numVuelta!=5){
-				tiempoVuelta=aleatorio(2,5);
-				sleep(tiempoVuelta);
-				pthread_mutex_unlock(&semaforoCorredor);
-				writeLog(id, msg1, identificadorCorredor, 0);
-				problemas = aleatorio(0,1);
-				if(problemas==1){
-				corredores[*(int*)numCorredor].estado==0;
-				}
 				if(corredores[n].sancionado==1){
 					/*pthread_cond_signal(&)*//*notifica al juez que ha visto la sanción*/
 					
 					/*pthread_cond2_wait()*//*espera a cumplir la sanción*/
-					
+					tiempoVuelta=aleatorio(2,5);
+					writeLog(id, msg1, identificadorCorredor, 0);
+					sleep(tiempoVuelta);
+					tiempoVuelta=tiempoVuelta+3;
+				}else{
+					tiempoVuelta=aleatorio(2,5);
+					writeLog(id, msg1, identificadorCorredor, 0);
+					sleep(tiempoVuelta);
 				}
+				corredores[n].tiempoTotal=corredores[n].tiempoTotal+ tiempoVuelta;
+				pthread_mutex_unlock(&semaforoCorredor);
+				problemas = aleatorio(0,1);
+				if(problemas==1){
+				corredores[*(int*)numCorredor].estado==0;
+				}
+				writeLog(id, msg2, identificadorCorredor, tiempoVuelta);
 				numVuelta ++;
 			}
 			if(numVuelta==5){
@@ -266,7 +278,7 @@ void *accionesJuez(){
 			a=aleatorio(0,numCorredores);
 		}
 		corredores[a].sancionado=1;
-		pthread_cond_wait(&)
+		//pthread_cond_wait(&)
 		
 		sleep(3);
 		corredores[a].sancionado=0;//después de cumplir la sanción		
@@ -307,6 +319,23 @@ void writeLog(char id[50], char msg[50], int num, int num2) {
 //hara un resumen de la carrera??
 void final(){
 	//si nos da tiempo crearemos un listado de como han quedado todos los corredores
+	int i;
+	int tiempoGanador=0;
+	int ganador;
+	char id[50]="Ganador_";
+	char msg1[50]="Tiempo_total :";
+	for(i=0; i=numCorredores; i++){
+		pthread_mutex_lock(&semaforoCorredor);
+		if(corredores[i].terminado==1){
+			if(corredores[i].tiempoTotal<=tiempoGanador){
+				tiempoGanador=corredores[i].tiempoTotal;
+				ganador=corredores[i].id;
+
+			}
+		}
+		pthread_mutex_unlock(&semaforoCorredor);
+	}
+	writeLog(id, msg1, ganador, tiempoGanador);
 	exit(0);
 }
 
